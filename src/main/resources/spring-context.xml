@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:cache="http://www.springframework.org/schema/cache" xmlns:task="http://www.springframework.org/schema/task"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+  http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+    http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.2.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd">
+
+
+  <context:component-scan base-package="com.aoto" use-default-filters="false">
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Component" />
+  </context:component-scan>
+  
+  <!-- 获取spring容器对象 -->
+  <bean id="springContextUtil" class="com.aoto.util.SpringContextUtil" />
+  
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <array>
+        <value>classpath:conf/proxool.properties</value>
+        <value>classpath:conf/config.properties</value>
+        <value>classpath:conf/redis.properties</value>
+      </array>
+    </property>
+  </bean>
+
+  <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+    <property name="defaultEncoding" value="UTF-8" />
+    <property name="basename" value="/static/js/locale/framework" />
+    <property name="cacheSeconds" value="86400"/> 
+    <property name="useCodeAsDefaultMessage" value="true" />
+  </bean>
+  
+ <!--  <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+      
+      tomcate
+      <property name="jndiName" value="java:comp/env/jdbc_wechat">
+      </property>
+      
+      
+      weblogic  银行生产
+      <property name="jndiName" value="jn_iqms">
+      </property>
+       
+  </bean>  -->
+  
+  <bean id="dataSource" class="org.logicalcobwebs.proxool.ProxoolDataSource" destroy-method="reset">
+    <property name="alias" value="${proxool.alias}" />
+    <property name="driver" value="${proxool.driver}" />
+    <property name="user" value="${proxool.user}" />
+    <property name="password" value="${proxool.password}" />
+    <property name="driverUrl" value="${proxool.url}" />
+    <property name="trace" value="${proxool.trace}" />
+    <property name="prototypeCount" value="${proxool.prototypeCount}" />
+    <property name="maximumConnectionCount" value="${proxool.maximumConnectionCount}" />
+    <property name="minimumConnectionCount" value="${proxool.minimumConnectionCount}" />
+    <property name="simultaneousBuildThrottle" value="${proxool.simultaneousBuildThrottle}" />
+    <property name="houseKeepingTestSql" value="${proxool.houseKeepingTestSql}" />
+  </bean>
+ 
+  
+ <!-- 4、事务管理     start -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    
+    <!-- 事务注解驱动 -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+    <!-- 4、事务管理     end -->
+    
+    <!-- 5、 mybatis 配置     start -->
+    <!-- 配置sqlSessionFactory start-->  
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	   <property name="dataSource" ref="dataSource" />
+	   <property name="configLocation" value="classpath:spring-mybatis.xml" />
+	</bean>
+    
+    <!-- sqlSessionTemplate 实现 -->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+	   <constructor-arg index="0" ref="sqlSessionFactory"></constructor-arg>
+	</bean>
+    
+    <!-- 扫描Dao接口所在的包名，自动创建动态代理类，用于service的自动注入 start -->    
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+	    <property name="basePackage" value="com.aoto.*.*.persistence.inf" />
+	    <property name="sqlSessionTemplateBeanName" value="sqlSessionTemplate"/>
+	</bean>
+    <!-- 5、 mybatis 配置     end --> 
+    
+    <import resource="spring-redis.xml" />
+    
+    <!-- 在filter中注入service
+    <bean id="openidFilter" class="com.aoto.wechat.entrance.web.controllers.filter.ValidateOpenidFilter" ></bean>
+	 -->
+</beans>
