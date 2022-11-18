@@ -98,6 +98,9 @@ public class Device implements Serializable {
 
 	private String faceDate;
 
+	//增加是否开关的属性
+	private String isOn;
+
 	public Device() {
 		super();
 	}
@@ -574,5 +577,12 @@ public class Device implements Serializable {
 	public void setIsDoubleScreen(int isDoubleScreen) {
 		this.isDoubleScreen = isDoubleScreen;
 	}
-	
+
+	public String getIsOn() {
+		return isOn;
+	}
+
+	public void setIsOn(String isOn) {
+		this.isOn = isOn;
+	}
 }
