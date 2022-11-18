@@ -22,8 +22,8 @@ public class Base64Convert {
 
 	public static void main(String[] args) {
 		// 将文件转换成字节数组，并转成字符串
-//		String strImg = GetImageStr();
-//		System.out.println(strImg);
+		String strImg = GetImageStr();
+		System.out.println(strImg);
 		// 对字节数组字符串进行Base64解码并生成图片
 		//GenerateImage(strImg);
 		
