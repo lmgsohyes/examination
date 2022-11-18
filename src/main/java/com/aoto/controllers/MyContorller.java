@@ -42,6 +42,9 @@ public class MyContorller {
 		String url = "http://172.16.210.181:8080/mips/single/sign?username="+encryptUnameUrl+"&pwd="+encryptPwdUrl;
 		System.out.println("转发地址"+url);
 		response.sendRedirect(url);  //将请求重定向到智能设备管理系统中
+
+		System.out.println("这是一个多余的测试代码");
+
 	}
 
 }
